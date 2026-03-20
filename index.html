@@ -1,128 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Name — Tagline</title>
-  <meta name="description" content="Your project description for SEO.">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            surface: { 1: '#09090b', 2: '#0f0f12', 3: '#16161a', 4: '#1e1e24' },
-            coral: { DEFAULT: '#e8735e', light: '#f09a8a', dark: '#c45a47' },
-            amber: { DEFAULT: '#d4a23a', light: '#e4be6a' },
-            zinc: { 50: '#fafafa', 100: '#f4f4f5', 200: '#e4e4e7', 300: '#d4d4d8', 400: '#a1a1aa', 500: '#71717a', 600: '#52525b', 700: '#3f3f46', 800: '#27272a', 900: '#18181b' }
-          },
-          fontFamily: {
-            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
-            mono: ['"JetBrains Mono"', 'monospace']
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    html { scroll-behavior: smooth; }
-    body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brightbase Partner Program</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { -webkit-font-smoothing: antialiased; }
+  button { font-family: inherit; }
+  #root { min-height: 100vh; }
+</style>
 </head>
-<body class="bg-surface-1 text-zinc-200 antialiased">
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState } = React;
 
-  <!-- ═══ DARK HERO ═══ -->
-  <header class="relative overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-b from-surface-1 via-surface-2 to-surface-3"></div>
-    <nav class="relative z-10 max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
-      <a href="/" class="text-lg font-bold tracking-tight text-white">ProjectName</a>
-      <div class="flex items-center gap-8">
-        <a href="#features" class="text-sm text-zinc-400 hover:text-white transition-colors">Features</a>
-        <a href="#about" class="text-sm text-zinc-400 hover:text-white transition-colors">About</a>
-        <a href="#cta" class="text-sm font-medium text-surface-1 bg-coral px-4 py-2 rounded-lg hover:bg-coral-light transition-colors">Get Started</a>
-      </div>
-    </nav>
-    <div class="relative z-10 max-w-4xl mx-auto px-6 pt-24 pb-32 text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-coral/10 border border-coral/20 rounded-full text-xs font-medium text-coral font-mono mb-8">
-        <span class="w-1.5 h-1.5 bg-coral rounded-full"></span>
-        STATUS OR TAGLINE
-      </div>
-      <h1 class="text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-[1.1] mb-6">
-        Your headline goes here<span class="text-coral">.</span>
-      </h1>
-      <p class="text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-10">
-        A clear, concise description of what this project does and why someone should care. Keep it to two sentences max.
-      </p>
-      <div class="flex items-center justify-center gap-4">
-        <a href="#cta" class="bg-coral text-surface-1 font-semibold px-6 py-3 rounded-lg hover:bg-coral-light transition-colors">Primary Action</a>
-        <a href="#features" class="border border-surface-4 text-zinc-300 font-medium px-6 py-3 rounded-lg hover:bg-surface-3 transition-colors">Learn More</a>
-      </div>
+const T = {
+  bg: "#FFFFFF", bgSubtle: "#F8F9FA", bgMuted: "#F1F3F5",
+  border: "#E5E7EB", borderLight: "#F0F0F0",
+  textPrimary: "#1A1D21", textSecondary: "#6B7280", textTertiary: "#9CA3AF",
+  accent: "#2563EB", accentLight: "#EFF6FF",
+  green: "#059669", greenLight: "#ECFDF5", greenBorder: "#A7F3D0",
+  amber: "#D97706", amberLight: "#FFFBEB", amberBorder: "#FDE68A",
+  purple: "#6B21A8", purpleLight: "#FAF5FF", purpleBorder: "#DDD6FE",
+  radius: "10px", radiusSm: "6px",
+  shadowMd: "0 4px 12px rgba(0,0,0,0.06)",
+  font: "'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif",
+  mono: "'JetBrains Mono', monospace",
+};
+
+const Chevron = ({ open }) => (
+  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 150ms ease", flexShrink: 0 }}>
+    <path d="M4.5 6.75L9 11.25L13.5 6.75" stroke={T.textTertiary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const Expandable = ({ title, subtitle, children, defaultOpen = false, num }) => {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div style={{ border: `1px solid ${T.border}`, borderRadius: T.radius, transition: "box-shadow 150ms ease", boxShadow: open ? T.shadowMd : "none", background: T.bg }}>
+      <button onClick={() => setOpen(!open)} style={{ width: "100%", padding: "20px 24px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "14px", background: "none", border: "none", cursor: "pointer", textAlign: "left", fontFamily: T.font }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "12px", flex: 1 }}>
+          {num && <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: T.textPrimary, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, flexShrink: 0, fontFamily: T.mono, marginTop: "1px" }}>{num}</div>}
+          <div>
+            <div style={{ fontSize: "16px", fontWeight: 600, color: T.textPrimary, lineHeight: 1.35, letterSpacing: "-0.01em" }}>{title}</div>
+            {subtitle && <div style={{ fontSize: "14px", color: T.textSecondary, marginTop: "3px", lineHeight: 1.55 }}>{subtitle}</div>}
+          </div>
+        </div>
+        <div style={{ marginTop: "3px" }}><Chevron open={open} /></div>
+      </button>
+      {open && <div style={{ padding: "0 24px 24px", fontSize: "14px", color: T.textSecondary, lineHeight: 1.65 }}><div style={{ borderTop: `1px solid ${T.borderLight}`, paddingTop: "20px" }}>{children}</div></div>}
     </div>
-  </header>
+  );
+};
 
-  <!-- ═══ LIGHT BODY ═══ -->
-  <main class="bg-zinc-50 text-zinc-900">
+const Tier = ({ level, children }) => {
+  const m = { 1: { bg: T.greenLight, color: T.green, border: T.greenBorder }, 2: { bg: T.amberLight, color: T.amber, border: T.amberBorder }, 3: { bg: T.purpleLight, color: T.purple, border: T.purpleBorder } };
+  const s = m[level] || m[1];
+  return <span style={{ display: "inline-flex", padding: "4px 10px", borderRadius: "100px", fontSize: "12px", fontWeight: 600, letterSpacing: "0.02em", color: s.color, background: s.bg, border: `1px solid ${s.border}` }}>{children}</span>;
+};
 
-    <!-- Features -->
-    <section id="features" class="max-w-6xl mx-auto px-6 py-24">
-      <div class="text-center mb-16">
-        <p class="text-sm font-semibold text-coral uppercase tracking-wider mb-3">Features</p>
-        <h2 class="text-3xl font-bold tracking-tight">What makes this different</h2>
-      </div>
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="bg-white border border-zinc-200 rounded-xl p-8">
-          <div class="w-10 h-10 bg-coral/10 rounded-lg flex items-center justify-center mb-4">
-            <span class="text-coral font-bold">01</span>
-          </div>
-          <h3 class="text-lg font-semibold mb-2">Feature One</h3>
-          <p class="text-zinc-500 leading-relaxed">Describe the feature and its benefit to the user. Keep it brief and benefit-focused.</p>
-        </div>
-        <div class="bg-white border border-zinc-200 rounded-xl p-8">
-          <div class="w-10 h-10 bg-coral/10 rounded-lg flex items-center justify-center mb-4">
-            <span class="text-coral font-bold">02</span>
-          </div>
-          <h3 class="text-lg font-semibold mb-2">Feature Two</h3>
-          <p class="text-zinc-500 leading-relaxed">Describe the feature and its benefit to the user. Keep it brief and benefit-focused.</p>
-        </div>
-        <div class="bg-white border border-zinc-200 rounded-xl p-8">
-          <div class="w-10 h-10 bg-coral/10 rounded-lg flex items-center justify-center mb-4">
-            <span class="text-coral font-bold">03</span>
-          </div>
-          <h3 class="text-lg font-semibold mb-2">Feature Three</h3>
-          <p class="text-zinc-500 leading-relaxed">Describe the feature and its benefit to the user. Keep it brief and benefit-focused.</p>
-        </div>
-      </div>
-    </section>
+const SNum = ({ n }) => <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: T.textTertiary, fontFamily: T.mono, marginBottom: "8px" }}>{n}</div>;
 
-    <!-- About -->
-    <section id="about" class="border-t border-zinc-200">
-      <div class="max-w-4xl mx-auto px-6 py-24 text-center">
-        <h2 class="text-3xl font-bold tracking-tight mb-6">About this project</h2>
-        <p class="text-lg text-zinc-500 leading-relaxed max-w-2xl mx-auto">
-          A longer description of the project, its background, and context. This section can be multiple paragraphs if needed.
-        </p>
-      </div>
-    </section>
-
-    <!-- CTA -->
-    <section id="cta" class="border-t border-zinc-200 bg-white">
-      <div class="max-w-4xl mx-auto px-6 py-24 text-center">
-        <h2 class="text-3xl font-bold tracking-tight mb-4">Ready to get started?</h2>
-        <p class="text-zinc-500 mb-8">Call to action supporting text.</p>
-        <a href="mailto:hello@brightbase.co" class="inline-block bg-surface-1 text-white font-semibold px-8 py-3.5 rounded-lg hover:bg-zinc-800 transition-colors">Get in Touch</a>
-      </div>
-    </section>
-  </main>
-
-  <!-- ═══ DARK FOOTER ═══ -->
-  <footer class="bg-surface-1 border-t border-surface-4">
-    <div class="max-w-6xl mx-auto px-6 py-8 flex items-center justify-between">
-      <p class="text-sm text-zinc-600">&copy; 2026 ProjectName. All rights reserved.</p>
-      <p class="text-xs text-zinc-700 font-mono">built on bbase.dev</p>
+const Callout = ({ label, children, variant = "accent" }) => {
+  const s = variant === "green" ? { bg: T.greenLight, border: T.greenBorder, lc: T.green } : { bg: T.accentLight, border: "#BFDBFE", lc: T.accent };
+  return (
+    <div style={{ padding: "20px 24px", borderRadius: T.radius, border: `1px solid ${s.border}`, background: s.bg, margin: "16px 0" }}>
+      <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", color: s.lc, marginBottom: "8px" }}>{label}</div>
+      <div style={{ fontSize: "14px", color: T.textSecondary, lineHeight: 1.65 }}>{children}</div>
     </div>
-  </footer>
+  );
+};
 
+const PricingCard = ({ title, price, items, tier }) => {
+  const [hover, setHover] = useState(false);
+  return (
+    <div style={{ flex: "1 1 220px", padding: "24px", borderRadius: T.radius, border: `1px solid ${T.border}`, background: T.bg, transition: "box-shadow 150ms ease", boxShadow: hover ? T.shadowMd : "none" }} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+      {tier && <div style={{ marginBottom: "12px" }}>{tier}</div>}
+      <div style={{ fontSize: "15px", fontWeight: 600, color: T.textPrimary, marginBottom: "4px" }}>{title}</div>
+      <div style={{ fontSize: "24px", fontWeight: 700, color: T.accent, marginBottom: "16px", fontFamily: T.mono, letterSpacing: "-0.02em" }}>{price}</div>
+      {items.map((item, i) => <div key={i} style={{ fontSize: "13px", color: T.textSecondary, padding: "4px 0", lineHeight: 1.55 }}><span style={{ color: T.textTertiary, marginRight: "8px" }}>—</span>{item}</div>)}
+    </div>
+  );
+};
+
+const StepRow = ({ num, title, desc }) => (
+  <div style={{ display: "flex", gap: "14px", alignItems: "flex-start" }}>
+    <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: T.textPrimary, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "13px", fontWeight: 700, flexShrink: 0, fontFamily: T.mono }}>{num}</div>
+    <div>
+      <div style={{ fontSize: "15px", fontWeight: 600, color: T.textPrimary, marginBottom: "2px" }}>{title}</div>
+      <div style={{ fontSize: "14px", color: T.textSecondary, lineHeight: 1.6 }}>{desc}</div>
+    </div>
+  </div>
+);
+
+const ProcessCard = ({ label, labelColor, steps }) => {
+  const [hover, setHover] = useState(false);
+  return (
+    <div style={{ border: `1px solid ${T.border}`, borderRadius: T.radius, padding: "28px", transition: "box-shadow 150ms ease", boxShadow: hover ? T.shadowMd : "none" }} onMouseEnter={() => setHover(true)} onMouseLeave={() => setHover(false)}>
+      <div style={{ fontSize: "11px", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: labelColor || T.accent, marginBottom: "20px" }}>{label}</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>{steps.map((s, i) => <StepRow key={i} num={i + 1} title={s.title} desc={s.desc} />)}</div>
+    </div>
+  );
+};
+
+function App() {
+  const [tab, setTab] = useState("overview");
+  const tabs = [{ id: "overview", label: "Overview" }, { id: "models", label: "Partnership Models" }, { id: "toolkits", label: "Partner Toolkits" }, { id: "how", label: "How It Works" }, { id: "whistic", label: "Whistic Intel" }];
+
+  return (
+    <div style={{ fontFamily: T.font, color: T.textPrimary, background: T.bg, minHeight: "100vh" }}>
+
+      {/* Hero */}
+      <div style={{ padding: "80px 32px 64px", borderBottom: `1px solid ${T.border}` }}>
+        <div style={{ maxWidth: "780px", margin: "0 auto" }}>
+          <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: T.accent, marginBottom: "16px" }}>Brightbase Partner Program</div>
+          <h1 style={{ fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Partner-Ready Creative for B2B SaaS</h1>
+          <p style={{ fontSize: "17px", color: T.textSecondary, maxWidth: "600px", margin: 0, lineHeight: 1.65 }}>We function as the full creative department for growth-stage SaaS teams — and we're building a partner ecosystem to grow together.</p>
+        </div>
+      </div>
+
+      {/* Tab nav */}
+      <div style={{ borderBottom: `1px solid ${T.border}`, background: T.bg, position: "sticky", top: 0, zIndex: 10 }}>
+        <div style={{ maxWidth: "780px", margin: "0 auto", display: "flex", padding: "0 32px", overflowX: "auto" }}>
+          {tabs.map(t => <button key={t.id} onClick={() => setTab(t.id)} style={{ padding: "14px 18px", fontSize: "14px", fontWeight: tab === t.id ? 600 : 400, color: tab === t.id ? T.accent : T.textTertiary, background: "none", border: "none", borderBottom: tab === t.id ? `2px solid ${T.accent}` : "2px solid transparent", cursor: "pointer", whiteSpace: "nowrap", fontFamily: T.font, transition: "all 150ms ease" }}>{t.label}</button>)}
+        </div>
+      </div>
+
+      {/* Content */}
+      <div style={{ maxWidth: "780px", margin: "0 auto", padding: "0 32px" }}>
+
+        {tab === "overview" && <div>
+          <div style={{ padding: "56px 0", borderBottom: `1px solid ${T.border}` }}>
+            <SNum n="01" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>What Is Brightbase?</h2>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 16px" }}>Brightbase is a fractional creative agency for B2B SaaS. We handle brand, web, and product marketing on retainer — embedded in your workflows, delivering faster turnaround, tighter brand consistency, and more capacity than an equivalent internal team at a fraction of the cost.</p>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: 0 }}>Our clients are typically Series A–C companies with $5–40M ARR and 1–10 person marketing teams. They need a creative department but aren't ready (or don't want) to build one in-house.</p>
+          </div>
+          <div style={{ padding: "56px 0", borderBottom: `1px solid ${T.border}` }}>
+            <SNum n="02" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>Why a Partner Program?</h2>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 16px" }}>Our best client relationships have always come through trusted referrals and shared ecosystems. We're formalizing that into a partner program — creating structured ways for complementary service providers, platforms, and agencies to grow alongside us.</p>
+            <Callout label="Positioning">"Partner-ready creative" is a capability, not a new service line. It means we understand how B2B SaaS ecosystems work and can extend your brand into your partner channels.</Callout>
+          </div>
+          <div style={{ padding: "56px 0", borderBottom: `1px solid ${T.border}` }}>
+            <SNum n="03" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>Who Should Partner With Us?</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "12px" }}>
+              {[{ type: "Fractional CMOs & Marketing Leaders", why: "You advise companies that need creative help. We're the team you bring in." }, { type: "Dev Agencies & Shops", why: "You build the product. We build the brand, site, and marketing layer." }, { type: "RevOps & Automation Consultancies", why: "You set up the stack. Clients need assets to run through it." }, { type: "SEO & Content Agencies", why: "You drive traffic. The site and brand need to convert it." }, { type: "SaaS Companies with Partner Ecosystems", why: "You need co-branded materials for 10–50+ partners. We productize that." }, { type: "Thought Leaders & Content Creators", why: "Co-create content that reaches both audiences. Shared exposure, no commissions." }].map((p, i) => (
+                <div key={i} style={{ padding: "16px 20px", borderRadius: T.radius, border: `1px solid ${T.border}`, transition: "box-shadow 150ms ease" }}>
+                  <div style={{ fontSize: "14px", fontWeight: 600, color: T.textPrimary, marginBottom: "4px" }}>{p.type}</div>
+                  <div style={{ fontSize: "13px", color: T.textSecondary, lineHeight: 1.55 }}>{p.why}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{ padding: "56px 0" }}>
+            <SNum n="04" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>Our ICP (Your Referral Target)</h2>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "20px" }}>
+              <Tier level={1}>B2B SaaS</Tier><Tier level={2}>Series A–C</Tier><Tier level={1}>$5–40M ARR</Tier><Tier level={2}>1–10 in Marketing</Tier><Tier level={3}>North America</Tier>
+            </div>
+            <h3 style={{ fontSize: "15px", fontWeight: 600, margin: "24px 0 8px" }}>Common triggers</h3>
+            <p style={{ color: T.textSecondary, fontSize: "14px", lineHeight: 1.65, margin: 0 }}>Recent funding round · Hiring for in-house creative roles · Recurring brand, web, or product marketing needs · Rebranding or brand evolution · Launching campaigns, pages, or product updates faster than the team can handle</p>
+          </div>
+        </div>}
+
+        {tab === "models" && <div>
+          <div style={{ padding: "56px 0 32px" }}>
+            <SNum n="01" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 12px" }}>Six Partnership Models</h2>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 32px" }}>From organic and informal to structured and productized. They work individually, but compound when combined.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <Expandable num="1" title="Client Ecosystem Spillover" subtitle="Your partners see our work through your engagement — and come to us directly." defaultOpen>
+                <p style={{ margin: "0 0 12px" }}>When we build marketing materials for a SaaS client, we proactively ask about their integration and channel partners. Co-branded landing pages, partner one-pagers, integration announcements — every asset is a calling card in front of another potential client.</p>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}><Tier level={1}>Zero effort</Tier><Tier level={1}>Start now</Tier></div>
+              </Expandable>
+              <Expandable num="2" title="Agency-to-Agency Subcontracting" subtitle="You win the deal, we handle brand, design, and front-end.">
+                <p style={{ margin: "0 0 12px" }}>For agencies that are dev-heavy but design-light, or strategy-focused but lack execution capacity. We plug in as your creative arm — retainer or project-based. White-label or co-branded — your choice.</p>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}><Tier level={1}>Direct revenue</Tier><Tier level={2}>Steady pipeline</Tier></div>
+              </Expandable>
+              <Expandable num="3" title="Platform Partner Programs" subtitle="Certified in HubSpot, Webflow, and WordPress — listed in their ecosystems.">
+                <p style={{ margin: "0 0 12px" }}>We build on HubSpot, Webflow, and WordPress daily. We're pursuing formal certifications and directory listings so companies searching for implementation and design help find us through the platforms they already use.</p>
+                <p style={{ margin: 0 }}>This is a passive inbound channel that runs once set up — and doubles as a credibility signal for prospects evaluating us.</p>
+              </Expandable>
+              <Expandable num="4" title="Partner Marketing Toolkits" subtitle="Productized creative packages for SaaS companies with partner ecosystems.">
+                <p style={{ margin: "0 0 12px" }}>Most B2B SaaS partner marketing teams are under-resourced. They need co-branded collateral for 10–50+ partners, but internal teams are focused on their own pipeline. We fill that gap with repeatable, templatized packages.</p>
+                <Callout label="See detailed packages">Switch to the Partner Toolkits tab for pricing tiers and deliverable breakdowns.</Callout>
+              </Expandable>
+              <Expandable num="5" title="Referral Partner Network" subtitle="Structured commissions for complementary providers who refer clients.">
+                <p style={{ margin: "0 0 12px" }}>Complementary service providers refer clients in exchange for 10% of first-year contract value, or a reciprocal referral arrangement. We keep this small and personal — 3–5 active partners with quarterly check-ins.</p>
+                <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}><Tier level={1}>10% commission</Tier><Tier level={2}>Reciprocal option</Tier></div>
+              </Expandable>
+              <Expandable num="6" title="Content Co-Marketing" subtitle="Co-create thought leadership. Share audiences, not commissions.">
+                <p style={{ margin: "0 0 12px" }}>We partner with complementary providers to co-create content — joint articles, webinars, or interviews — that reaches both audiences. This ties into our Expert Insight series, where we interview marketing leaders and create value-based content promoting them in return.</p>
+                <p style={{ margin: 0 }}>Neither party competes for the same budget. Both gain visibility with the other's audience.</p>
+              </Expandable>
+            </div>
+          </div>
+          <div style={{ padding: "0 0 56px" }}>
+            <Callout label="The Flywheel" variant="green">Platform partnerships bring inbound leads. Those clients have partner ecosystems we serve with toolkits. Toolkit work creates spillover exposure to the client's partners. Relationships get formalized as referral partnerships. Larger projects involve agency partners. Each model feeds the others.</Callout>
+          </div>
+        </div>}
+
+        {tab === "toolkits" && <div>
+          <div style={{ padding: "56px 0", borderBottom: `1px solid ${T.border}` }}>
+            <SNum n="01" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 12px" }}>Partner Marketing Toolkits</h2>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 32px" }}>Repeatable creative packages for SaaS companies that need to enable their partner ecosystems with co-branded marketing materials.</p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "16px" }}>
+              <PricingCard tier={<Tier level={1}>Launch</Tier>} title="Partner Launch Kit" price="$3–5K" items={["Co-branded landing page", "Partner one-pager (PDF)", "Announcement email template", "Social media templates (3–5)", "1–2 week turnaround"]} />
+              <PricingCard tier={<Tier level={2}>Enablement</Tier>} title="Partner Enablement Package" price="$10–20K" items={["Full partner portal / directory page", "Onboarding collateral suite", "Co-branded case study template", "Integration marketing kit", "Partner announcement playbook", "3–4 week turnaround"]} />
+              <PricingCard tier={<Tier level={3}>Ongoing</Tier>} title="Partner Marketing Retainer" price="$3–5K/mo" items={["Monthly support for active programs", "New partner onboarding (2–4/mo)", "Template maintenance & updates", "Co-branded asset production", "Scales with partner volume"]} />
+            </div>
+          </div>
+          <div style={{ padding: "56px 0", borderBottom: `1px solid ${T.border}` }}>
+            <SNum n="02" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>The Multiplier Effect</h2>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 16px" }}>If you have 30 integration partners, a single toolkit engagement puts Brightbase's work in front of 30 companies — each a potential future client. For you, it means professional, on-brand partner collateral without your internal team lifting a finger.</p>
+            <Callout label="The Gap">Most B2B SaaS partner marketing teams are under-resourced and focused on their own pipeline. Partner-facing collateral gets deprioritized. We make it someone's job — ours.</Callout>
+          </div>
+          <div style={{ padding: "56px 0" }}>
+            <SNum n="03" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>Deliverable Types</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "8px" }}>
+              {["Co-branded landing pages", "Integration announcement posts", "Partner directory pages", "One-pagers & sell sheets", "Case study templates", "Email announcement kits", "Social media templates", "Partner onboarding decks", "Webinar co-branding", "Event collateral"].map((item, i) => (
+                <div key={i} style={{ padding: "10px 14px", borderRadius: T.radiusSm, background: T.bgSubtle, fontSize: "14px", color: T.textSecondary, display: "flex", alignItems: "center", gap: "10px" }}>
+                  <span style={{ color: T.textTertiary, fontSize: "11px", fontFamily: T.mono, fontWeight: 600, width: "20px" }}>{String(i + 1).padStart(2, "0")}</span>{item}
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>}
+
+        {tab === "how" && <div>
+          <div style={{ padding: "56px 0 32px" }}>
+            <SNum n="01" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 12px" }}>How It Works</h2>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 32px" }}>Whether you're referring a client, subcontracting us on a project, or exploring toolkits — the process is simple.</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+              <ProcessCard label="For Referral Partners" labelColor={T.green} steps={[
+                { title: "Make an intro", desc: "Connect us with a company that fits our ICP. A warm email or a quick Zoom intro — whatever feels natural." },
+                { title: "We take it from there", desc: "We handle the sales conversation, scoping, and proposal. You stay in the loop as much or little as you want." },
+                { title: "Get paid", desc: "10% of first-year contract value once they sign. Paid quarterly. Or we set up a reciprocal referral arrangement." },
+              ]} />
+              <ProcessCard label="For Agency Partners" labelColor={T.amber} steps={[
+                { title: "Share the brief", desc: "You've won a project that needs brand, design, or front-end. Send us the brief and timeline." },
+                { title: "We embed", desc: "We work within your process — your tools, your timelines, your client communication style. White-label or co-branded." },
+                { title: "You deliver", desc: "You present the work. We stay behind the scenes or join calls — your choice. Billed on retainer or per-project." },
+              ]} />
+              <ProcessCard label="For Partner Toolkits" labelColor={T.purple} steps={[
+                { title: "Tell us about your ecosystem", desc: "How many partners? What types? What collateral exists today? What's the gap?" },
+                { title: "We scope a package", desc: "Launch Kit, Enablement Package, or ongoing retainer — based on your partner volume and needs." },
+                { title: "Your partners get enabled", desc: "Professional, on-brand co-marketing materials — without your internal team lifting a finger." },
+              ]} />
+            </div>
+          </div>
+          <div style={{ padding: "0 0 80px" }}>
+            <div style={{ padding: "28px", border: `1px solid ${T.border}`, borderRadius: T.radius, borderLeft: `3px solid ${T.accent}`, background: T.bgSubtle, textAlign: "center" }}>
+              <div style={{ fontSize: "18px", fontWeight: 600, color: T.textPrimary, marginBottom: "8px" }}>Let's explore a partnership.</div>
+              <p style={{ fontSize: "14px", color: T.textSecondary, margin: "0 0 16px", lineHeight: 1.6 }}>Whether it's a referral, a subcontracting arrangement, or a toolkit engagement — start with a conversation.</p>
+              <span style={{ display: "inline-block", padding: "10px 24px", background: T.accent, color: "#fff", borderRadius: T.radiusSm, fontSize: "14px", fontWeight: 600 }}>loren@brightbase.co</span>
+            </div>
+          </div>
+        </div>}
+        {tab === "whistic" && <div>
+          <div style={{ padding: "20px 0 0" }}>
+            <div style={{ padding: "16px 20px", borderRadius: T.radiusSm, background: "#FEF2F2", border: "1px solid #FECACA", fontSize: "13px", color: "#991B1B", marginBottom: "32px" }}>
+              <strong>Internal only</strong> — This tab is call prep for the Wade/Whistic relationship. Not partner-facing.
+            </div>
+          </div>
+
+          <div style={{ padding: "0 0 56px", borderBottom: `1px solid ${T.border}` }}>
+            <SNum n="01" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>What Is Whistic?</h2>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 16px" }}>Whistic is an AI-first third-party risk management (TPRM) platform based in Pleasant Grove, Utah. Founded in 2015, it helps InfoSec teams automate vendor security assessments, publish Trust Centers, and manage compliance. Three product pillars: <strong style={{color: T.textPrimary}}>Whistic Assess</strong> (AI-powered vendor risk copilot), <strong style={{color: T.textPrimary}}>Trust Center</strong> (centralized security posture sharing), and <strong style={{color: T.textPrimary}}>Trust Center Exchange</strong> (network of thousands of vendor profiles for zero-touch assessments).</p>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 24px" }}>Key differentiator: dual-sided model — serves both buyers assessing vendors AND vendors proactively sharing their posture to accelerate sales.</p>
+
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px" }}>
+              {[
+                { label: "Revenue (2024)", value: "~$11.5M", note: "+51% YoY from $7.6M" },
+                { label: "Total Funding", value: "$51.9M", note: "Series B ($35M) June 2022" },
+                { label: "Employees", value: "~65–83", note: "Down ~37% YoY — lean" },
+                { label: "Marketing Team", value: "~2 people", note: "Wade + creative (India)" },
+              ].map((c, i) => (
+                <div key={i} style={{ border: `1px solid ${T.border}`, borderRadius: T.radius, padding: "16px 18px" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: T.textTertiary, marginBottom: "4px" }}>{c.label}</div>
+                  <div style={{ fontSize: "20px", fontWeight: 700, color: T.textPrimary }}>{c.value}</div>
+                  <div style={{ fontSize: "12px", color: T.textTertiary, marginTop: "2px" }}>{c.note}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ padding: "56px 0 32px" }}>
+            <SNum n="02" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 12px" }}>Key Intel</h2>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 24px" }}>Expandable briefing sections — skim the headlines, dig in where relevant.</p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              <Expandable title="Competitive Landscape" subtitle="Whistic vs. Vanta, OneTrust, SafeBase, Drata, and others.">
+                <p style={{ margin: "0 0 12px" }}><strong style={{color: T.textPrimary}}>Vanta</strong> ($2.45B valuation, 1000+ employees) is the 800-lb gorilla in compliance automation + VRM. <strong style={{color: T.textPrimary}}>OneTrust</strong> ($4.5B+) is enterprise-focused broad GRC. <strong style={{color: T.textPrimary}}>SafeBase</strong> (Series B) is a direct Trust Center competitor. <strong style={{color: T.textPrimary}}>Drata</strong> ($2B+) does compliance automation with a VRM bolt-on.</p>
+                <p style={{ margin: "0 0 12px" }}>Whistic differentiates on (1) the dual-sided model, (2) the Trust Center Exchange network for zero-touch assessments, and (3) AI-first automation with 96% claimed accuracy.</p>
+                <Callout label="What this means for Wade">He's walking into a company with strong PMF and meaningful revenue growth, but massively outgunned on marketing spend by competitors 10-50x their size. His job is to make Whistic punch above its weight. That's a brand, web, and content problem — Brightbase's sweet spot.</Callout>
+              </Expandable>
+
+              <Expandable title="Partner Ecosystem — 20+ Strategic Partners" subtitle="Google Cloud, AWS, Mastercard, PwC, and more.">
+                <p style={{ margin: "0 0 12px" }}><strong style={{color: T.textPrimary}}>Strategic:</strong> Google Cloud, AWS (ISV Accelerate + Marketplace), PwC, Mastercard/RiskRecon, Cloud Security Alliance, G2, Shared Assessments, Vendor Security Alliance (founded by Airbnb, Atlassian, Uber, Dropbox, Palantir, GoDaddy), Tropic, Zip, Optiv, Tevora, Carahsoft, BARR Advisory.</p>
+                <p style={{ margin: "0 0 12px" }}><strong style={{color: T.textPrimary}}>Tech Integrations:</strong> Jira, Salesforce, Slack, BitSight, DocuSign, RiskRecon, Okta, OneLogin, Active Directory.</p>
+                <Callout label="Partner Marketing Opportunity" variant="green">With 20+ strategic partners and a 2-person marketing team, there's virtually zero chance they are servicing this ecosystem with the creative assets it deserves. Textbook Model 1 + Model 4 opportunity.</Callout>
+              </Expandable>
+
+              <Expandable title="Website & Brand Assessment" subtitle="Built by Daylight Studio — functional but not elevating the product.">
+                <p style={{ margin: "0 0 12px", fontWeight: 600, color: T.textPrimary }}>What's working:</p>
+                <p style={{ margin: "0 0 16px" }}>Clear product architecture. Good customer logos (Navan, Gainsight, Formstack). ROI calculator as a conversion tool. Competitor comparison page shows confidence. Trust Center Exchange as a freemium growth loop.</p>
+                <p style={{ margin: "0 0 12px", fontWeight: 600, color: T.textPrimary }}>What needs work:</p>
+                <p style={{ margin: "0 0 12px" }}>Visual identity feels dated — dark backgrounds with generic SVG illustrations don't convey "AI-first modern platform." Messaging is dense and jargon-heavy ("Agentic TPRM platform"). Partner pages are plain — logo + paragraph, no co-branded assets. Case studies are thin (short testimonials, not metrics-driven). "Whistic is Evolving" banner plastered everywhere suggests a product evolution moment where the marketing infrastructure may not be ready.</p>
+                <Callout label="The In-House Creative Gap">The in-house creative in India is inexpensive but not producing elevated work. The design is competent but generic. This is the classic gap Brightbase fills — Wade has seen the difference firsthand at Coalesce.</Callout>
+              </Expandable>
+
+              <Expandable title="Why Right Now Matters" subtitle="Five things converging that make this moment ripe.">
+                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+                  <StepRow num="1" title='"Whistic is Evolving" event — March 19, 2026' desc="Heavy product evolution promotion suggests a rebrand or repositioning is imminent. If the product evolves, marketing materials need to evolve with it." />
+                  <StepRow num="2" title="Mastercard partnership (March 2025)" desc="Major credibility moment needing marketing amplification — co-branded assets, case studies, announcement materials." />
+                  <StepRow num="3" title="Revenue rebound" desc="From $7.6M (2023) to $11.5M (2024). Growth mode again means marketing investment should be increasing." />
+                  <StepRow num="4" title="ISO 42001 certification" desc="Responsible AI certification — strong differentiator that needs to be woven into brand messaging and sales materials." />
+                  <StepRow num="5" title="Wade's 90-day window" desc="New marketing leaders have a window to assess and make moves. If you're going to be part of his plan, you need to be in the conversation before it solidifies." />
+                </div>
+              </Expandable>
+
+              <Expandable title="Leadership Team" subtitle="Key people to know.">
+                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                  {[
+                    { name: "Juan Rodriguez", role: "Founder & CEO", note: "Technical founder, CS degree, hands-on product leader" },
+                    { name: "Karl Ford", role: "VP, Product & Engineering", note: "Engineering team of ~17" },
+                    { name: "Aaron Swanson", role: "VP, Sales & Customer Success", note: "22 quota-carrying sales reps" },
+                    { name: "Wade Tibke", role: "Marketing leadership (title TBC)", note: "New hire. Likely SVP/VP Marketing or CMO. Building function from scratch." },
+                  ].map((p, i) => (
+                    <div key={i} style={{ padding: "12px 16px", borderRadius: T.radiusSm, background: T.bgSubtle, display: "flex", gap: "12px", alignItems: "baseline", flexWrap: "wrap" }}>
+                      <span style={{ fontWeight: 600, color: T.textPrimary, fontSize: "14px" }}>{p.name}</span>
+                      <span style={{ fontSize: "13px", color: T.textSecondary }}>{p.role}</span>
+                      <span style={{ fontSize: "12px", color: T.textTertiary }}>— {p.note}</span>
+                    </div>
+                  ))}
+                </div>
+              </Expandable>
+            </div>
+          </div>
+
+          <div style={{ padding: "0 0 56px", borderBottom: `1px solid ${T.border}` }}>
+            <SNum n="03" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 12px" }}>Engagement Opportunities</h2>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 24px" }}>Ordered by likelihood of immediate fit. These are conversation threads, not pitches.</p>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+              {[
+                { pri: 1, prLabel: "High — Immediate", title: "Brand & Website Refresh", est: "$15–30K initial · $3–5K/mo retainer", why: "If the product is evolving, the site needs to match. Current design doesn't convey 'AI-first modern platform.' High-impact, visible project that helps Wade prove himself quickly.", color: "#DC2626" },
+                { pri: 1, prLabel: "High — Quick Win", title: "Case Study & Sales Enablement Package", est: "$8–15K project", why: "Current case studies are thin quotes. Enterprise InfoSec buyers need metrics-driven case studies for procurement. 22 sales reps means better collateral → shorter cycles → more revenue.", color: "#DC2626" },
+                { pri: 2, prLabel: "Medium — Strategic", title: "Partner Marketing Toolkit", est: "$5–12K per kit · $3–5K/mo retainer", why: "20+ strategic partners (Google Cloud, AWS, Mastercard, PwC) with no marketing support. Wade understands partner ecosystems from Coalesce. Every kit puts your work in front of major enterprise brands.", color: T.amber },
+                { pri: 2, prLabel: "Medium — Content Engine", title: "Content & Thought Leadership Program", est: "$3–5K/mo retainer", why: "2-person marketing team competing against Vanta's content machine. Blog, ghostwritten LinkedIn for Wade/Juan, webinar collateral, email nurture for Trust Center → paid conversion.", color: T.amber },
+                { pri: 3, prLabel: "Lower — Long Play", title: "Event & Conference Presence", est: "$5–10K per event", why: "Whistic exhibits at RSA Conference, Black Hat. Worth mentioning as a capability once a retainer is established.", color: T.green },
+              ].map((opp, i) => (
+                <div key={i} style={{ border: `1px solid ${T.border}`, borderRadius: T.radius, padding: "24px", transition: "box-shadow 150ms ease" }}>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: T.mono, fontSize: "11px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "8px", color: opp.color }}>
+                    <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: opp.color }} /> {opp.prLabel}
+                  </div>
+                  <div style={{ fontSize: "16px", fontWeight: 700, color: T.textPrimary, marginBottom: "4px" }}>{opp.title}</div>
+                  <div style={{ fontFamily: T.mono, fontSize: "12px", color: T.accent, marginBottom: "12px" }}>{opp.est}</div>
+                  <p style={{ fontSize: "14px", color: T.textSecondary, lineHeight: 1.6, margin: 0 }}>{opp.why}</p>
+                </div>
+              ))}
+            </div>
+
+            <Callout label="Total Potential">Annual engagement: $60–120K. That's a meaningful retainer for Brightbase and a fraction of what Wade would pay to build an in-house team.</Callout>
+          </div>
+
+          <div style={{ padding: "56px 0", borderBottom: `1px solid ${T.border}` }}>
+            <SNum n="04" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>Updated Call Strategy</h2>
+
+            <Expandable title="Opening — What to Ask" subtitle="You know it's Whistic now, so adjust accordingly." defaultOpen>
+              <p style={{ margin: "0 0 12px" }}>Let Wade tell you about Whistic — ask <em>"So what drew you to Whistic?"</em> Then show genuine awareness: <em>"TPRM is a hot space — I see they just announced a Mastercard partnership and they're doing an 'evolving' event next week. What's the vision you're building toward?"</em></p>
+              <p style={{ margin: 0 }}>This signals homework without being heavy-handed.</p>
+            </Expandable>
+
+            <div style={{ height: "12px" }} />
+
+            <Expandable title="Pain Points to Listen For" subtitle="What Wade might say and what it means for you.">
+              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                {[
+                  ['"The brand doesn\'t match the product"', "→ Website refresh opening"],
+                  ['"We need better sales materials"', "→ Case study / enablement package"],
+                  ['"We have all these partners but no marketing support"', "→ Partner toolkit"],
+                  ['"I have a designer in India but..."', "→ He's telling you he needs Brightbase"],
+                  ['"We\'re competing against Vanta/OneTrust"', "→ Positioning and brand are the lever"],
+                  ['"My team is tiny"', "→ Fractional creative department pitch"],
+                ].map(([pain, meaning], i) => (
+                  <div key={i} style={{ display: "flex", gap: "12px", fontSize: "14px", alignItems: "baseline" }}>
+                    <span style={{ color: T.textPrimary, fontWeight: 600, flex: "1 1 50%" }}>{pain}</span>
+                    <span style={{ color: T.accent, flex: "1 1 50%" }}>{meaning}</span>
+                  </div>
+                ))}
+              </div>
+            </Expandable>
+
+            <div style={{ height: "12px" }} />
+
+            <Expandable title="The Seed to Plant" subtitle="If the moment is right.">
+              <p style={{ margin: "0 0 16px", fontStyle: "italic", color: T.textPrimary }}>"I looked at the Whistic site and the partner ecosystem is impressive — Google Cloud, AWS, Mastercard. One thing we've been doing more of is helping SaaS companies build out partner marketing as a function. It's usually a huge gap because partner teams are always understaffed. If that's something you're thinking about, I'd love to explore it with you."</p>
+              <Callout label="Best Outcome" variant="green">Wade leaves the call thinking: "Loren already understands my situation better than I've been able to articulate it internally." That's what makes Wade bring his agency to every company. Not the pitch. The understanding.</Callout>
+            </Expandable>
+
+            <div style={{ height: "12px" }} />
+
+            <Expandable title="Pricing Strategy" subtitle="How to enter without overpricing the first move.">
+              <p style={{ margin: "0 0 12px" }}><strong style={{color: T.textPrimary}}>Don't lead with the retainer.</strong> Lead with a project — the website refresh or case study package — that demonstrates value quickly. Once Wade sees the output quality vs. what the India creative produces, the retainer conversation happens naturally.</p>
+              <p style={{ margin: "0 0 12px" }}>Realistic entry point: <strong style={{color: T.textPrimary}}>$8–15K initial project → $3–5K/mo retainer</strong>. At Whistic's revenue, that's ~0.5–1% of ARR on outsourced creative — well within normal B2B SaaS marketing spend.</p>
+              <p style={{ margin: 0 }}>At $5K/month, Brightbase = $60K/year. Two US hires (designer + marketing manager) = $190–260K loaded. That's <strong style={{color: T.textPrimary}}>25–30% of the cost</strong> with no ramp-up time.</p>
+            </Expandable>
+          </div>
+
+          <div style={{ padding: "56px 0" }}>
+            <SNum n="05" />
+            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>Opportunity Summary</h2>
+            <div style={{ border: `1px solid ${T.border}`, borderRadius: T.radius, overflow: "hidden" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
+                <thead><tr style={{ background: T.bgMuted }}>
+                  {["Opportunity", "Entry Point", "Retainer", "Timeline"].map(h => <th key={h} style={{ textAlign: "left", padding: "10px 14px", fontWeight: 600, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.06em", color: T.textTertiary, borderBottom: `1px solid ${T.border}` }}>{h}</th>)}
+                </tr></thead>
+                <tbody>
+                  {[
+                    ["Website/Brand Refresh", "$15–30K", "$3–5K/mo", "Q2 2026"],
+                    ["Case Studies + Enablement", "$8–15K", "Add-on", "30–60 days"],
+                    ["Partner Marketing Toolkits", "$5–12K per kit", "$3–5K/mo", "Q2–Q3"],
+                    ["Content Program", "$3–5K/mo", "Ongoing", "With retainer"],
+                    ["Event Collateral", "$5–10K/event", "Seasonal", "Pre-RSA/Black Hat"],
+                  ].map((row, i) => (
+                    <tr key={i}><td style={{ padding: "12px 14px", borderBottom: `1px solid ${T.borderLight}`, fontWeight: 600, color: T.textPrimary }}>{row[0]}</td>
+                    {row.slice(1).map((cell, j) => <td key={j} style={{ padding: "12px 14px", borderBottom: `1px solid ${T.borderLight}`, color: T.textSecondary }}>{cell}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "16px 0 0", fontSize: "15px" }}><strong style={{color: T.textPrimary}}>Total potential annual engagement: $60–120K.</strong></p>
+          </div>
+        </div>}
+
+      </div>
+
+      <div style={{ padding: "40px 0 60px", textAlign: "center", fontSize: "13px", color: T.textTertiary, borderTop: `1px solid ${T.border}` }}>Brightbase Partner Program · brightbase.co</div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App />, document.getElementById('root'));
+</script>
 </body>
 </html>
