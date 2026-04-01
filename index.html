@@ -13,12 +13,32 @@
   body { -webkit-font-smoothing: antialiased; }
   button { font-family: inherit; }
   #root { min-height: 100vh; }
+  [data-editing="true"] { outline: 2px solid rgba(37, 99, 235, 0.15); border-radius: 4px; cursor: text; min-height: 1em; }
+  [data-editing="true"]:hover { outline-color: rgba(37, 99, 235, 0.3); }
+  [data-editing="true"]:focus { outline-color: rgba(37, 99, 235, 0.5); background: rgba(37, 99, 235, 0.03); }
+  .edit-toolbar { position: fixed; bottom: 24px; right: 24px; display: flex; gap: 8px; z-index: 1000; font-family: 'DM Sans', sans-serif; }
+  .edit-toolbar button { padding: 10px 20px; border-radius: 8px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 16px rgba(0,0,0,0.12); transition: all 150ms ease; }
+  .edit-toolbar button:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.16); }
+  .edit-badge { position: fixed; top: 16px; right: 16px; z-index: 1000; padding: 6px 14px; border-radius: 100px; background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; font-size: 12px; font-weight: 600; font-family: 'DM Sans', sans-serif; pointer-events: none; }
+  .toast { position: fixed; bottom: 80px; right: 24px; z-index: 1000; padding: 12px 20px; border-radius: 8px; background: #059669; color: #fff; font-size: 14px; font-weight: 600; font-family: 'DM Sans', sans-serif; box-shadow: 0 4px 16px rgba(0,0,0,0.15); animation: fadeInUp 200ms ease; }
+  @keyframes fadeInUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .note-pin { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: #D97706; color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 5; border: 2px solid #fff; }
+  .note-indicator { position: relative; }
+  .note-bubble { position: absolute; top: -8px; right: -8px; z-index: 20; width: 280px; background: #FFFBEB; border: 1px solid #FDE68A; border-radius: 8px; padding: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.12); font-family: 'DM Sans', sans-serif; }
+  .note-bubble textarea { width: 100%; border: 1px solid #E5E7EB; border-radius: 6px; padding: 8px; font-size: 13px; font-family: 'DM Sans', sans-serif; resize: vertical; min-height: 60px; line-height: 1.5; }
+  .note-bubble textarea:focus { outline: none; border-color: #D97706; }
+  .note-bubble-actions { display: flex; gap: 6px; margin-top: 8px; justify-content: flex-end; }
+  .note-bubble-actions button { padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: 'DM Sans', sans-serif; }
+  .note-hover-btn { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: #D97706; color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.15); opacity: 0; transition: opacity 150ms; z-index: 5; }
+  [data-editing="true"]:hover .note-hover-btn { opacity: 1; }
+  .notes-panel { position: fixed; top: 0; right: 0; width: 340px; height: 100vh; background: #fff; border-left: 1px solid #E5E7EB; z-index: 1001; overflow-y: auto; padding: 24px; box-shadow: -4px 0 24px rgba(0,0,0,0.08); font-family: 'DM Sans', sans-serif; }
+  .notes-panel h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: #1A1D21; }
 </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="text/babel">
-const { useState } = React;
+const { useState, useRef, useEffect, useCallback } = React;
 
 const T = {
   bg: "#FFFFFF", bgSubtle: "#F8F9FA", bgMuted: "#F1F3F5",
@@ -111,13 +131,149 @@ const ProcessCard = ({ label, labelColor, steps }) => {
 
 function App() {
   const [tab, setTab] = useState("overview");
-  const tabs = [{ id: "overview", label: "Overview" }, { id: "models", label: "Partnership Models" }, { id: "toolkits", label: "Partner Toolkits" }, { id: "how", label: "How It Works" }, { id: "whistic", label: "Whistic Intel" }];
+  const [editMode, setEditMode] = useState(false);
+  const [toast, setToast] = useState(null);
+  const contentRef = useRef(null);
+  const tabs = [{ id: "overview", label: "Overview" }, { id: "models", label: "Partnership Models" }, { id: "toolkits", label: "Partner Toolkits" }, { id: "how", label: "How It Works" }];
+
+  const [notes, setNotes] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('bb-partner-notes') || '[]'); } catch { return []; }
+  });
+  const [activeNote, setActiveNote] = useState(null);
+  const [showNotes, setShowNotes] = useState(false);
+  const noteCounter = useRef(notes.length);
+
+  useEffect(() => {
+    localStorage.setItem('bb-partner-notes', JSON.stringify(notes));
+  }, [notes]);
+
+  const isLeafText = (el) => {
+    if (el.closest('.edit-toolbar, .edit-badge, .notes-panel, .note-bubble')) return false;
+    if (el.tagName === 'BUTTON' || el.closest('button')) return false;
+    if (el.tagName === 'SVG' || el.closest('svg')) return false;
+    const dominated = el.querySelector('h1, h2, h3, p, div, table, ul, ol');
+    if (dominated) return false;
+    const text = el.innerText || '';
+    return text.trim().length > 0;
+  };
+
+  useEffect(() => {
+    const hero = document.querySelector('[data-hero]');
+    const root = contentRef.current;
+    if (!root && !hero) return;
+    const containers = [root, hero].filter(Boolean);
+    containers.forEach(container => {
+      const els = container.querySelectorAll('h1, h2, h3, p, td, span, div');
+      els.forEach(el => {
+        if (!isLeafText(el)) return;
+        if (editMode) {
+          el.contentEditable = 'true';
+          el.dataset.editing = 'true';
+          el.style.position = 'relative';
+        } else {
+          el.contentEditable = 'false';
+          delete el.dataset.editing;
+        }
+      });
+    });
+  }, [editMode, tab]);
+
+  const addNote = useCallback((text, sectionHint) => {
+    noteCounter.current += 1;
+    const note = { id: noteCounter.current, text, tab, section: sectionHint || '', timestamp: new Date().toLocaleString() };
+    setNotes(prev => [...prev, note]);
+    setActiveNote(null);
+    setToast('Note saved');
+    setTimeout(() => setToast(null), 2000);
+  }, [tab]);
+
+  const deleteNote = useCallback((id) => {
+    setNotes(prev => prev.filter(n => n.id !== id));
+  }, []);
+
+  const handleExport = useCallback(() => {
+    const root = contentRef.current;
+    if (!root) return;
+    const lines = [];
+    const activeTab = tabs.find(t => t.id === tab);
+    lines.push(`# ${activeTab ? activeTab.label : tab}\n`);
+    root.querySelectorAll('h1, h2, h3, p, div, span, td').forEach(el => {
+      if (!isLeafText(el)) return;
+      const tag = el.tagName.toLowerCase();
+      const text = el.innerText.trim();
+      if (!text || text.length < 2) return;
+      if (tag === 'h1') lines.push(`## ${text}\n`);
+      else if (tag === 'h2') lines.push(`### ${text}\n`);
+      else if (tag === 'h3') lines.push(`#### ${text}\n`);
+      else lines.push(`${text}\n`);
+    });
+    if (notes.length > 0) {
+      lines.push(`\n---\n# Change Notes\n`);
+      notes.forEach(n => {
+        lines.push(`- [${n.tab}${n.section ? ' > ' + n.section : ''}] ${n.text}\n`);
+      });
+    }
+    const output = lines.join('\n');
+    navigator.clipboard.writeText(output).then(() => {
+      setToast('Copied — paste to Claude Code');
+      setTimeout(() => setToast(null), 2000);
+    });
+  }, [tab, notes]);
+
+  const NoteInput = ({ onSave, onCancel }) => {
+    const [val, setVal] = useState('');
+    const ref = useRef(null);
+    useEffect(() => { ref.current && ref.current.focus(); }, []);
+    return (
+      <div className="note-bubble" onClick={e => e.stopPropagation()}>
+        <div style={{ fontSize: '12px', fontWeight: 600, color: '#D97706', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Leave a note</div>
+        <textarea ref={ref} value={val} onChange={e => setVal(e.target.value)} placeholder="What should change here?" onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); val.trim() && onSave(val.trim()); }}} />
+        <div className="note-bubble-actions">
+          <button onClick={onCancel} style={{ background: '#F1F3F5', color: '#6B7280' }}>Cancel</button>
+          <button onClick={() => val.trim() && onSave(val.trim())} style={{ background: '#D97706', color: '#fff' }}>Save</button>
+        </div>
+      </div>
+    );
+  };
+
+  const NotesPanel = () => (
+    <div className="notes-panel">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+        <h3 style={{ margin: 0 }}>Change Notes ({notes.length})</h3>
+        <button onClick={() => setShowNotes(false)} style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#6B7280' }}>×</button>
+      </div>
+      {notes.length === 0 && <p style={{ color: '#9CA3AF', fontSize: '14px' }}>No notes yet. Click "Add Note" in edit mode to leave feedback.</p>}
+      {notes.map(n => (
+        <div key={n.id} style={{ padding: '14px', border: '1px solid #FDE68A', borderRadius: '8px', background: '#FFFBEB', marginBottom: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{n.tab}{n.section ? ' > ' + n.section : ''}</span>
+            <button onClick={() => deleteNote(n.id)} style={{ background: 'none', border: 'none', fontSize: '14px', cursor: 'pointer', color: '#9CA3AF', padding: '0 2px' }}>×</button>
+          </div>
+          <div style={{ fontSize: '14px', color: '#1A1D21', lineHeight: 1.55 }}>{n.text}</div>
+          <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '6px' }}>{n.timestamp}</div>
+        </div>
+      ))}
+      {notes.length > 0 && <button onClick={handleExport} style={{ width: '100%', padding: '10px', background: '#1A1D21', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: 600, cursor: 'pointer', marginTop: '8px' }}>Copy All for Claude Code</button>}
+    </div>
+  );
 
   return (
     <div style={{ fontFamily: T.font, color: T.textPrimary, background: T.bg, minHeight: "100vh" }}>
+      {editMode && <div className="edit-badge">Edit Mode — click text to edit, leave notes for changes</div>}
+      <div className="edit-toolbar">
+        {editMode && notes.length > 0 && <button onClick={() => setShowNotes(!showNotes)} style={{ background: '#FFFBEB', color: '#D97706', border: '1px solid #FDE68A' }}>Notes ({notes.length})</button>}
+        {editMode && <button onClick={() => setActiveNote(activeNote === 'global' ? null : 'global')} style={{ background: '#D97706', color: '#fff' }}>+ Add Note</button>}
+        {editMode && <button onClick={handleExport} style={{ background: '#fff', color: '#1A1D21', border: '1px solid #E5E7EB' }}>Copy All</button>}
+        <button onClick={() => { setEditMode(!editMode); setActiveNote(null); }} style={{ background: editMode ? '#1A1D21' : '#2563EB', color: '#fff' }}>
+          {editMode ? 'Done Editing' : 'Edit Page'}
+        </button>
+      </div>
+      {activeNote === 'global' && <div style={{ position: 'fixed', bottom: '80px', right: '24px', zIndex: 1001 }}><NoteInput onSave={(text) => addNote(text, '')} onCancel={() => setActiveNote(null)} /></div>}
+      {showNotes && <NotesPanel />}
+      {toast && <div className="toast">{toast}</div>}
 
       {/* Hero */}
-      <div style={{ padding: "80px 32px 64px", borderBottom: `1px solid ${T.border}` }}>
+      <div data-hero style={{ padding: "80px 32px 64px", borderBottom: `1px solid ${T.border}` }}>
         <div style={{ maxWidth: "780px", margin: "0 auto" }}>
           <div style={{ fontSize: "12px", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase", color: T.accent, marginBottom: "16px" }}>Brightbase Partner Program</div>
           <h1 style={{ fontSize: "clamp(28px, 5vw, 40px)", fontWeight: 700, lineHeight: 1.15, letterSpacing: "-0.025em", margin: "0 0 16px" }}>Partner-Ready Creative for B2B SaaS</h1>
@@ -133,7 +289,7 @@ function App() {
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: "780px", margin: "0 auto", padding: "0 32px" }}>
+      <div ref={contentRef} style={{ maxWidth: "780px", margin: "0 auto", padding: "0 32px" }}>
 
         {tab === "overview" && <div>
           <div style={{ padding: "56px 0", borderBottom: `1px solid ${T.border}` }}>
@@ -267,187 +423,6 @@ function App() {
               <p style={{ fontSize: "14px", color: T.textSecondary, margin: "0 0 16px", lineHeight: 1.6 }}>Whether it's a referral, a subcontracting arrangement, or a toolkit engagement — start with a conversation.</p>
               <span style={{ display: "inline-block", padding: "10px 24px", background: T.accent, color: "#fff", borderRadius: T.radiusSm, fontSize: "14px", fontWeight: 600 }}>loren@brightbase.co</span>
             </div>
-          </div>
-        </div>}
-        {tab === "whistic" && <div>
-          <div style={{ padding: "20px 0 0" }}>
-            <div style={{ padding: "16px 20px", borderRadius: T.radiusSm, background: "#FEF2F2", border: "1px solid #FECACA", fontSize: "13px", color: "#991B1B", marginBottom: "32px" }}>
-              <strong>Internal only</strong> — This tab is call prep for the Wade/Whistic relationship. Not partner-facing.
-            </div>
-          </div>
-
-          <div style={{ padding: "0 0 56px", borderBottom: `1px solid ${T.border}` }}>
-            <SNum n="01" />
-            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>What Is Whistic?</h2>
-            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 16px" }}>Whistic is an AI-first third-party risk management (TPRM) platform based in Pleasant Grove, Utah. Founded in 2015, it helps InfoSec teams automate vendor security assessments, publish Trust Centers, and manage compliance. Three product pillars: <strong style={{color: T.textPrimary}}>Whistic Assess</strong> (AI-powered vendor risk copilot), <strong style={{color: T.textPrimary}}>Trust Center</strong> (centralized security posture sharing), and <strong style={{color: T.textPrimary}}>Trust Center Exchange</strong> (network of thousands of vendor profiles for zero-touch assessments).</p>
-            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 24px" }}>Key differentiator: dual-sided model — serves both buyers assessing vendors AND vendors proactively sharing their posture to accelerate sales.</p>
-
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: "12px" }}>
-              {[
-                { label: "Revenue (2024)", value: "~$11.5M", note: "+51% YoY from $7.6M" },
-                { label: "Total Funding", value: "$51.9M", note: "Series B ($35M) June 2022" },
-                { label: "Employees", value: "~65–83", note: "Down ~37% YoY — lean" },
-                { label: "Marketing Team", value: "~2 people", note: "Wade + creative (India)" },
-              ].map((c, i) => (
-                <div key={i} style={{ border: `1px solid ${T.border}`, borderRadius: T.radius, padding: "16px 18px" }}>
-                  <div style={{ fontSize: "11px", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.08em", color: T.textTertiary, marginBottom: "4px" }}>{c.label}</div>
-                  <div style={{ fontSize: "20px", fontWeight: 700, color: T.textPrimary }}>{c.value}</div>
-                  <div style={{ fontSize: "12px", color: T.textTertiary, marginTop: "2px" }}>{c.note}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ padding: "56px 0 32px" }}>
-            <SNum n="02" />
-            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 12px" }}>Key Intel</h2>
-            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 24px" }}>Expandable briefing sections — skim the headlines, dig in where relevant.</p>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              <Expandable title="Competitive Landscape" subtitle="Whistic vs. Vanta, OneTrust, SafeBase, Drata, and others.">
-                <p style={{ margin: "0 0 12px" }}><strong style={{color: T.textPrimary}}>Vanta</strong> ($2.45B valuation, 1000+ employees) is the 800-lb gorilla in compliance automation + VRM. <strong style={{color: T.textPrimary}}>OneTrust</strong> ($4.5B+) is enterprise-focused broad GRC. <strong style={{color: T.textPrimary}}>SafeBase</strong> (Series B) is a direct Trust Center competitor. <strong style={{color: T.textPrimary}}>Drata</strong> ($2B+) does compliance automation with a VRM bolt-on.</p>
-                <p style={{ margin: "0 0 12px" }}>Whistic differentiates on (1) the dual-sided model, (2) the Trust Center Exchange network for zero-touch assessments, and (3) AI-first automation with 96% claimed accuracy.</p>
-                <Callout label="What this means for Wade">He's walking into a company with strong PMF and meaningful revenue growth, but massively outgunned on marketing spend by competitors 10-50x their size. His job is to make Whistic punch above its weight. That's a brand, web, and content problem — Brightbase's sweet spot.</Callout>
-              </Expandable>
-
-              <Expandable title="Partner Ecosystem — 20+ Strategic Partners" subtitle="Google Cloud, AWS, Mastercard, PwC, and more.">
-                <p style={{ margin: "0 0 12px" }}><strong style={{color: T.textPrimary}}>Strategic:</strong> Google Cloud, AWS (ISV Accelerate + Marketplace), PwC, Mastercard/RiskRecon, Cloud Security Alliance, G2, Shared Assessments, Vendor Security Alliance (founded by Airbnb, Atlassian, Uber, Dropbox, Palantir, GoDaddy), Tropic, Zip, Optiv, Tevora, Carahsoft, BARR Advisory.</p>
-                <p style={{ margin: "0 0 12px" }}><strong style={{color: T.textPrimary}}>Tech Integrations:</strong> Jira, Salesforce, Slack, BitSight, DocuSign, RiskRecon, Okta, OneLogin, Active Directory.</p>
-                <Callout label="Partner Marketing Opportunity" variant="green">With 20+ strategic partners and a 2-person marketing team, there's virtually zero chance they are servicing this ecosystem with the creative assets it deserves. Textbook Model 1 + Model 4 opportunity.</Callout>
-              </Expandable>
-
-              <Expandable title="Website & Brand Assessment" subtitle="Built by Daylight Studio — functional but not elevating the product.">
-                <p style={{ margin: "0 0 12px", fontWeight: 600, color: T.textPrimary }}>What's working:</p>
-                <p style={{ margin: "0 0 16px" }}>Clear product architecture. Good customer logos (Navan, Gainsight, Formstack). ROI calculator as a conversion tool. Competitor comparison page shows confidence. Trust Center Exchange as a freemium growth loop.</p>
-                <p style={{ margin: "0 0 12px", fontWeight: 600, color: T.textPrimary }}>What needs work:</p>
-                <p style={{ margin: "0 0 12px" }}>Visual identity feels dated — dark backgrounds with generic SVG illustrations don't convey "AI-first modern platform." Messaging is dense and jargon-heavy ("Agentic TPRM platform"). Partner pages are plain — logo + paragraph, no co-branded assets. Case studies are thin (short testimonials, not metrics-driven). "Whistic is Evolving" banner plastered everywhere suggests a product evolution moment where the marketing infrastructure may not be ready.</p>
-                <Callout label="The In-House Creative Gap">The in-house creative in India is inexpensive but not producing elevated work. The design is competent but generic. This is the classic gap Brightbase fills — Wade has seen the difference firsthand at Coalesce.</Callout>
-              </Expandable>
-
-              <Expandable title="Why Right Now Matters" subtitle="Five things converging that make this moment ripe.">
-                <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-                  <StepRow num="1" title='"Whistic is Evolving" event — March 19, 2026' desc="Heavy product evolution promotion suggests a rebrand or repositioning is imminent. If the product evolves, marketing materials need to evolve with it." />
-                  <StepRow num="2" title="Mastercard partnership (March 2025)" desc="Major credibility moment needing marketing amplification — co-branded assets, case studies, announcement materials." />
-                  <StepRow num="3" title="Revenue rebound" desc="From $7.6M (2023) to $11.5M (2024). Growth mode again means marketing investment should be increasing." />
-                  <StepRow num="4" title="ISO 42001 certification" desc="Responsible AI certification — strong differentiator that needs to be woven into brand messaging and sales materials." />
-                  <StepRow num="5" title="Wade's 90-day window" desc="New marketing leaders have a window to assess and make moves. If you're going to be part of his plan, you need to be in the conversation before it solidifies." />
-                </div>
-              </Expandable>
-
-              <Expandable title="Leadership Team" subtitle="Key people to know.">
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  {[
-                    { name: "Juan Rodriguez", role: "Founder & CEO", note: "Technical founder, CS degree, hands-on product leader" },
-                    { name: "Karl Ford", role: "VP, Product & Engineering", note: "Engineering team of ~17" },
-                    { name: "Aaron Swanson", role: "VP, Sales & Customer Success", note: "22 quota-carrying sales reps" },
-                    { name: "Wade Tibke", role: "Marketing leadership (title TBC)", note: "New hire. Likely SVP/VP Marketing or CMO. Building function from scratch." },
-                  ].map((p, i) => (
-                    <div key={i} style={{ padding: "12px 16px", borderRadius: T.radiusSm, background: T.bgSubtle, display: "flex", gap: "12px", alignItems: "baseline", flexWrap: "wrap" }}>
-                      <span style={{ fontWeight: 600, color: T.textPrimary, fontSize: "14px" }}>{p.name}</span>
-                      <span style={{ fontSize: "13px", color: T.textSecondary }}>{p.role}</span>
-                      <span style={{ fontSize: "12px", color: T.textTertiary }}>— {p.note}</span>
-                    </div>
-                  ))}
-                </div>
-              </Expandable>
-            </div>
-          </div>
-
-          <div style={{ padding: "0 0 56px", borderBottom: `1px solid ${T.border}` }}>
-            <SNum n="03" />
-            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 12px" }}>Engagement Opportunities</h2>
-            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "0 0 24px" }}>Ordered by likelihood of immediate fit. These are conversation threads, not pitches.</p>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-              {[
-                { pri: 1, prLabel: "High — Immediate", title: "Brand & Website Refresh", est: "$15–30K initial · $3–5K/mo retainer", why: "If the product is evolving, the site needs to match. Current design doesn't convey 'AI-first modern platform.' High-impact, visible project that helps Wade prove himself quickly.", color: "#DC2626" },
-                { pri: 1, prLabel: "High — Quick Win", title: "Case Study & Sales Enablement Package", est: "$8–15K project", why: "Current case studies are thin quotes. Enterprise InfoSec buyers need metrics-driven case studies for procurement. 22 sales reps means better collateral → shorter cycles → more revenue.", color: "#DC2626" },
-                { pri: 2, prLabel: "Medium — Strategic", title: "Partner Marketing Toolkit", est: "$5–12K per kit · $3–5K/mo retainer", why: "20+ strategic partners (Google Cloud, AWS, Mastercard, PwC) with no marketing support. Wade understands partner ecosystems from Coalesce. Every kit puts your work in front of major enterprise brands.", color: T.amber },
-                { pri: 2, prLabel: "Medium — Content Engine", title: "Content & Thought Leadership Program", est: "$3–5K/mo retainer", why: "2-person marketing team competing against Vanta's content machine. Blog, ghostwritten LinkedIn for Wade/Juan, webinar collateral, email nurture for Trust Center → paid conversion.", color: T.amber },
-                { pri: 3, prLabel: "Lower — Long Play", title: "Event & Conference Presence", est: "$5–10K per event", why: "Whistic exhibits at RSA Conference, Black Hat. Worth mentioning as a capability once a retainer is established.", color: T.green },
-              ].map((opp, i) => (
-                <div key={i} style={{ border: `1px solid ${T.border}`, borderRadius: T.radius, padding: "24px", transition: "box-shadow 150ms ease" }}>
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: "6px", fontFamily: T.mono, fontSize: "11px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase", marginBottom: "8px", color: opp.color }}>
-                    <span style={{ width: "8px", height: "8px", borderRadius: "50%", background: opp.color }} /> {opp.prLabel}
-                  </div>
-                  <div style={{ fontSize: "16px", fontWeight: 700, color: T.textPrimary, marginBottom: "4px" }}>{opp.title}</div>
-                  <div style={{ fontFamily: T.mono, fontSize: "12px", color: T.accent, marginBottom: "12px" }}>{opp.est}</div>
-                  <p style={{ fontSize: "14px", color: T.textSecondary, lineHeight: 1.6, margin: 0 }}>{opp.why}</p>
-                </div>
-              ))}
-            </div>
-
-            <Callout label="Total Potential">Annual engagement: $60–120K. That's a meaningful retainer for Brightbase and a fraction of what Wade would pay to build an in-house team.</Callout>
-          </div>
-
-          <div style={{ padding: "56px 0", borderBottom: `1px solid ${T.border}` }}>
-            <SNum n="04" />
-            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>Updated Call Strategy</h2>
-
-            <Expandable title="Opening — What to Ask" subtitle="You know it's Whistic now, so adjust accordingly." defaultOpen>
-              <p style={{ margin: "0 0 12px" }}>Let Wade tell you about Whistic — ask <em>"So what drew you to Whistic?"</em> Then show genuine awareness: <em>"TPRM is a hot space — I see they just announced a Mastercard partnership and they're doing an 'evolving' event next week. What's the vision you're building toward?"</em></p>
-              <p style={{ margin: 0 }}>This signals homework without being heavy-handed.</p>
-            </Expandable>
-
-            <div style={{ height: "12px" }} />
-
-            <Expandable title="Pain Points to Listen For" subtitle="What Wade might say and what it means for you.">
-              <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-                {[
-                  ['"The brand doesn\'t match the product"', "→ Website refresh opening"],
-                  ['"We need better sales materials"', "→ Case study / enablement package"],
-                  ['"We have all these partners but no marketing support"', "→ Partner toolkit"],
-                  ['"I have a designer in India but..."', "→ He's telling you he needs Brightbase"],
-                  ['"We\'re competing against Vanta/OneTrust"', "→ Positioning and brand are the lever"],
-                  ['"My team is tiny"', "→ Fractional creative department pitch"],
-                ].map(([pain, meaning], i) => (
-                  <div key={i} style={{ display: "flex", gap: "12px", fontSize: "14px", alignItems: "baseline" }}>
-                    <span style={{ color: T.textPrimary, fontWeight: 600, flex: "1 1 50%" }}>{pain}</span>
-                    <span style={{ color: T.accent, flex: "1 1 50%" }}>{meaning}</span>
-                  </div>
-                ))}
-              </div>
-            </Expandable>
-
-            <div style={{ height: "12px" }} />
-
-            <Expandable title="The Seed to Plant" subtitle="If the moment is right.">
-              <p style={{ margin: "0 0 16px", fontStyle: "italic", color: T.textPrimary }}>"I looked at the Whistic site and the partner ecosystem is impressive — Google Cloud, AWS, Mastercard. One thing we've been doing more of is helping SaaS companies build out partner marketing as a function. It's usually a huge gap because partner teams are always understaffed. If that's something you're thinking about, I'd love to explore it with you."</p>
-              <Callout label="Best Outcome" variant="green">Wade leaves the call thinking: "Loren already understands my situation better than I've been able to articulate it internally." That's what makes Wade bring his agency to every company. Not the pitch. The understanding.</Callout>
-            </Expandable>
-
-            <div style={{ height: "12px" }} />
-
-            <Expandable title="Pricing Strategy" subtitle="How to enter without overpricing the first move.">
-              <p style={{ margin: "0 0 12px" }}><strong style={{color: T.textPrimary}}>Don't lead with the retainer.</strong> Lead with a project — the website refresh or case study package — that demonstrates value quickly. Once Wade sees the output quality vs. what the India creative produces, the retainer conversation happens naturally.</p>
-              <p style={{ margin: "0 0 12px" }}>Realistic entry point: <strong style={{color: T.textPrimary}}>$8–15K initial project → $3–5K/mo retainer</strong>. At Whistic's revenue, that's ~0.5–1% of ARR on outsourced creative — well within normal B2B SaaS marketing spend.</p>
-              <p style={{ margin: 0 }}>At $5K/month, Brightbase = $60K/year. Two US hires (designer + marketing manager) = $190–260K loaded. That's <strong style={{color: T.textPrimary}}>25–30% of the cost</strong> with no ramp-up time.</p>
-            </Expandable>
-          </div>
-
-          <div style={{ padding: "56px 0" }}>
-            <SNum n="05" />
-            <h2 style={{ fontSize: "28px", fontWeight: 700, letterSpacing: "-0.02em", lineHeight: 1.2, margin: "0 0 20px" }}>Opportunity Summary</h2>
-            <div style={{ border: `1px solid ${T.border}`, borderRadius: T.radius, overflow: "hidden" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
-                <thead><tr style={{ background: T.bgMuted }}>
-                  {["Opportunity", "Entry Point", "Retainer", "Timeline"].map(h => <th key={h} style={{ textAlign: "left", padding: "10px 14px", fontWeight: 600, fontSize: "12px", textTransform: "uppercase", letterSpacing: "0.06em", color: T.textTertiary, borderBottom: `1px solid ${T.border}` }}>{h}</th>)}
-                </tr></thead>
-                <tbody>
-                  {[
-                    ["Website/Brand Refresh", "$15–30K", "$3–5K/mo", "Q2 2026"],
-                    ["Case Studies + Enablement", "$8–15K", "Add-on", "30–60 days"],
-                    ["Partner Marketing Toolkits", "$5–12K per kit", "$3–5K/mo", "Q2–Q3"],
-                    ["Content Program", "$3–5K/mo", "Ongoing", "With retainer"],
-                    ["Event Collateral", "$5–10K/event", "Seasonal", "Pre-RSA/Black Hat"],
-                  ].map((row, i) => (
-                    <tr key={i}><td style={{ padding: "12px 14px", borderBottom: `1px solid ${T.borderLight}`, fontWeight: 600, color: T.textPrimary }}>{row[0]}</td>
-                    {row.slice(1).map((cell, j) => <td key={j} style={{ padding: "12px 14px", borderBottom: `1px solid ${T.borderLight}`, color: T.textSecondary }}>{cell}</td>)}</tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <p style={{ color: T.textSecondary, lineHeight: 1.65, margin: "16px 0 0", fontSize: "15px" }}><strong style={{color: T.textPrimary}}>Total potential annual engagement: $60–120K.</strong></p>
           </div>
         </div>}
 
